@@ -1,3 +1,9 @@
+## [0.95.1](https://github.com/koharu-rs/koharu/compare/0.95.0..0.95.1) - 2026-11-24
+
+### 📚 Documentation
+
+- Say where the log file is in troubleshooting, and keep RUST_LOG for more detailed logs - ([31c8090](https://github.com/koharu-rs/koharu/commit/31c80900aed28b54cd6ef311d649da364a1ec94f))
+
 ## [0.95.0](https://github.com/koharu-rs/koharu/compare/0.94.1..0.95.0) - 2026-11-24
 
 ### ⛰️  Features
