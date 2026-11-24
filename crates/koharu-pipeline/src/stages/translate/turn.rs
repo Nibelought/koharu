@@ -112,7 +112,7 @@ impl<'a> Turn<'a> {
         if let Some(reasoning) = self.reasoning {
             options = options.reasoning(reasoning);
         }
-        let request = koharu_llm::answers(model, schema(&self.keys)?)
+        let request = koharu_llm::answers(model, schema(&self.keys)?)?
             .preamble(&self.system)
             .options(options)
             .build()
