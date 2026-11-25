@@ -3,7 +3,7 @@
 //! host it pins for one, and the hosts OpenRouter lists for a model.
 
 use anyhow::{Context, Result, ensure};
-use rig_core::providers::openrouter::PROVIDER_NAME;
+use rig_core::{driver::DynModel, operation::Completion, providers::openrouter::PROVIDER_NAME};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
@@ -42,16 +42,46 @@ fn provider(routing: Option<Routing>, pin: Option<&str>) -> Value {
     }
 }
 
-/// The `provider` object a request to OpenRouter's model `id` carries.
-pub(crate) fn request(id: &str) -> Result<Value> {
+/// The routing rule and the host pinned for OpenRouter's model `id`, as the
+/// preferences hold them.
+fn saved(id: &str) -> Result<(Option<Routing>, Option<String>)> {
     let providers: Providers = koharu_config::get()?;
     let endpoint = providers.0.get(PROVIDER_NAME);
-    Ok(provider(
+    Ok((
         endpoint.and_then(|endpoint| endpoint.routing),
-        endpoint
-            .and_then(|endpoint| endpoint.pins.get(id))
-            .map(String::as_str),
+        endpoint.and_then(|endpoint| endpoint.pins.get(id).cloned()),
     ))
+}
+
+/// The `provider` object a request to OpenRouter's model `id` carries.
+pub(crate) fn request(id: &str) -> Result<Value> {
+    let (routing, pin) = saved(id)?;
+    Ok(provider(routing, pin.as_deref()))
+}
+
+/// `error`, a failed request to `model`, with what a pinned host's refusal
+/// means: OpenRouter answers 404 "No endpoints found" when the one host a
+/// request is pinned to can't serve it, which `error` words at length.
+pub fn explain(model: &DynModel<Completion>, error: anyhow::Error) -> anyhow::Error {
+    let Some(spec) = model.spec() else {
+        return error;
+    };
+    let pin = saved(&spec.id).ok().and_then(|(_, pin)| pin);
+    explained(spec.provider.vendor(), pin.as_deref(), error)
+}
+
+/// `error`, a failed request to `vendor`'s model, with a note that its
+/// `pin`ned host can't serve it, when `vendor` is OpenRouter, a host is
+/// pinned, and OpenRouter found no endpoint for the request; otherwise as it is.
+fn explained(vendor: &str, pin: Option<&str>, error: anyhow::Error) -> anyhow::Error {
+    match pin {
+        Some(tag) if vendor == PROVIDER_NAME && format!("{error:#}").contains("No endpoints found") => {
+            error.context(format!(
+                "OpenRouter's provider `{tag}`, pinned for this model, can't serve this request. Choose Auto or another provider in Settings → Pipeline → Translator"
+            ))
+        }
+        _ => error,
+    }
 }
 
 /// The hosts OpenRouter lists for model `id`, `author/slug`, which its
@@ -162,6 +192,38 @@ mod tests {
                 "allow_fallbacks": false,
             })
         );
+    }
+
+    const NO_ENDPOINTS: &str = r#"ProviderResponseError: status 404 Not Found: {"error":{"message":"No endpoints found that can handle the requested parameters.","code":404}}"#;
+
+    /// The refusal of a pinned host is worded for the user, and the original
+    /// error stays as its cause.
+    #[test]
+    fn a_pinned_host_that_cannot_serve_the_request_is_named() {
+        let error = explained(
+            PROVIDER_NAME,
+            Some("tenstorrent/fp8"),
+            anyhow::anyhow!(NO_ENDPOINTS),
+        );
+        let text = format!("{error:#}");
+        assert!(text.starts_with("OpenRouter's provider `tenstorrent/fp8`, pinned for this model"));
+        assert!(text.ends_with(NO_ENDPOINTS));
+        assert_eq!(error.root_cause().to_string(), NO_ENDPOINTS);
+    }
+
+    #[test]
+    fn an_error_is_left_as_it_is_unless_a_pin_caused_it() {
+        let unchanged = |vendor, pin, text: &str| {
+            let error = explained(vendor, pin, anyhow::anyhow!(text.to_owned()));
+            assert_eq!(format!("{error:#}"), text);
+        };
+        unchanged(PROVIDER_NAME, None, NO_ENDPOINTS);
+        unchanged(
+            PROVIDER_NAME,
+            Some("novita"),
+            "status 429 Too Many Requests",
+        );
+        unchanged("openai", Some("novita"), NO_ENDPOINTS);
     }
 
     #[test]

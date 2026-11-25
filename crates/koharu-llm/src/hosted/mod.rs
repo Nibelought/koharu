@@ -28,7 +28,7 @@ use secrecy::ExposeSecret;
 use serde::{Deserialize, Serialize};
 
 pub(crate) use http::{Http, SignIn, reqwest};
-pub use routing::{Host, Routing, hosts};
+pub use routing::{Host, Routing, explain, hosts};
 
 /// The vendors Koharu lists models from, by rig's names.
 pub const VENDORS: &[&str] = &[

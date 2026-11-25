@@ -122,7 +122,7 @@ impl<'a> Turn<'a> {
             response = request.into_future() => response.map_err(|error| match error {
                 // The answer was cut off, which rig words as a cancelled run.
                 PromptError::Cancelled { reason, .. } => anyhow!(reason),
-                error => error.into(),
+                error => koharu_llm::explain(model, error.into()),
             })?,
             () = self.cancel.cancelled() => return Ok(None),
         };

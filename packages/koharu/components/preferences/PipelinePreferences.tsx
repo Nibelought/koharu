@@ -296,8 +296,14 @@ function OpenRouterHost({
   const labelled = (hosts.data ?? []).map((host) => [host.tag, hostLabel(host)] as const)
   labelled.sort(([, a], [, b]) => a.localeCompare(b))
   for (const [tag, label] of labelled) choices[tag] = label
-  // A pin the list doesn't show, as while it loads, stays shown.
-  if (value && !(value in choices)) choices[value] = value
+  // A pin the list doesn't show stays shown; once the list has loaded, it is one the model no
+  // longer has, which fails its requests.
+  const unavailable = hosts.isSuccess && !!value && !(value in choices)
+  if (value && !(value in choices)) {
+    choices[value] = unavailable
+      ? t('settings.pipeline.translator.hostUnavailable', { tag: value })
+      : value
+  }
   return (
     <PreferenceRow
       title={t('settings.pipeline.translator.host')}
@@ -306,7 +312,11 @@ function OpenRouterHost({
           ? t('settings.pipeline.translator.hostLoading')
           : hosts.isError
             ? t('settings.pipeline.translator.hostError')
-            : t('settings.pipeline.translator.hostDescription')
+            : unavailable
+              ? t('settings.pipeline.translator.hostUnavailableDescription')
+              : hosts.data.length === 0
+                ? t('settings.pipeline.translator.hostNone')
+                : t('settings.pipeline.translator.hostDescription')
       }
     >
       <Choice
