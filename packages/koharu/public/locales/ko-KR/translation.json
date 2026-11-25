@@ -426,7 +426,7 @@
       "translator": {
         "host": "OpenRouter 제공자",
         "hostAuto": "자동(라우팅 규칙 사용)",
-        "hostDescription": "이 모델의 요청을 폴백 없이 지정한 OpenRouter 제공자 한 곳으로만 보냅니다. '자동'은 제공자 설정의 라우팅 기본 설정을 따릅니다.",
+        "hostDescription": "이 모델의 요청을 폴백 없이 지정한 OpenRouter 제공자 한 곳으로만 보냅니다. 이 모델에 대해 구조화된 출력을 지원하는 제공자만 목록에 표시됩니다. '자동'은 제공자 설정의 라우팅 기본 설정을 따릅니다.",
         "hostError": "제공자를 불러오지 못했습니다.",
         "hostLoading": "제공자 불러오는 중…",
         "instructions": "추가 지시",

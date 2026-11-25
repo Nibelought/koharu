@@ -426,7 +426,7 @@
       "translator": {
         "host": "OpenRouter sağlayıcısı",
         "hostAuto": "Otomatik (yönlendirme kuralını kullan)",
-        "hostDescription": "Bu modelin isteklerini yedek kullanmadan yalnızca tek bir OpenRouter sağlayıcısına gönderir. \"Otomatik\", Sağlayıcılar ayarlarındaki yönlendirme tercihini izler.",
+        "hostDescription": "Bu modelin isteklerini yedek kullanmadan yalnızca tek bir OpenRouter sağlayıcısına gönderir. Yalnızca bu model için yapılandırılmış çıktıyı destekleyen sağlayıcılar listelenir. \"Otomatik\", Sağlayıcılar ayarlarındaki yönlendirme tercihini izler.",
         "hostError": "Sağlayıcılar yüklenemedi.",
         "hostLoading": "Sağlayıcılar yükleniyor…",
         "instructions": "Ek talimatlar",

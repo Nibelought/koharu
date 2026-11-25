@@ -426,7 +426,7 @@
       "translator": {
         "host": "Provedor do OpenRouter",
         "hostAuto": "Automático (usar a regra de roteamento)",
-        "hostDescription": "Envia as solicitações deste modelo a apenas um provedor do OpenRouter, sem alternativas. \"Automático\" segue a preferência de roteamento nas configurações de Provedores.",
+        "hostDescription": "Envia as solicitações deste modelo a apenas um provedor do OpenRouter, sem alternativas. Apenas os provedores que oferecem suporte a saída estruturada para este modelo são listados. \"Automático\" segue a preferência de roteamento nas configurações de Provedores.",
         "hostError": "Não foi possível carregar os provedores.",
         "hostLoading": "Carregando provedores…",
         "instructions": "Instruções adicionais",

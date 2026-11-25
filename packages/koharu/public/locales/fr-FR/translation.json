@@ -426,7 +426,7 @@
       "translator": {
         "host": "Fournisseur OpenRouter",
         "hostAuto": "Auto (utiliser la règle de routage)",
-        "hostDescription": "Envoie les requêtes de ce modèle à un seul fournisseur OpenRouter, sans repli. « Auto » suit la préférence de routage des réglages Fournisseurs.",
+        "hostDescription": "Envoie les requêtes de ce modèle à un seul fournisseur OpenRouter, sans repli. Seuls les fournisseurs qui prennent en charge la sortie structurée pour ce modèle sont listés. « Auto » suit la préférence de routage des réglages Fournisseurs.",
         "hostError": "Impossible de charger les fournisseurs.",
         "hostLoading": "Chargement des fournisseurs…",
         "instructions": "Instructions supplémentaires",

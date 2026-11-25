@@ -84,7 +84,10 @@ pub async fn hosts(id: &str) -> Result<Vec<Host>> {
 }
 
 /// The hosts `reply`, an endpoints list, names, once each; a row with no tag
-/// is no host a request can pin.
+/// is no host a request can pin, and one that doesn't list
+/// `structured_outputs` among its `supported_parameters` can't serve the
+/// request's strict schema: OpenRouter answers 404 for it, as `provider`
+/// requires every parameter.
 fn hosts_in(reply: &Value) -> Vec<Host> {
     let mut hosts: Vec<Host> = Vec::new();
     for row in reply
@@ -99,6 +102,17 @@ fn hosts_in(reply: &Value) -> Vec<Host> {
                 .filter(|text| !text.is_empty())
         };
         let Some(tag) = text("tag") else { continue };
+        let structured = row
+            .get("supported_parameters")
+            .and_then(Value::as_array)
+            .is_some_and(|parameters| {
+                parameters
+                    .iter()
+                    .any(|parameter| parameter.as_str() == Some("structured_outputs"))
+            });
+        if !structured {
+            continue;
+        }
         if hosts.iter().any(|host| host.tag == tag) {
             continue;
         }
@@ -153,10 +167,16 @@ mod tests {
     #[test]
     fn the_hosts_are_read_from_an_endpoints_list() {
         let reply = json!({"data": {"endpoints": [
-            {"provider_name": "DeepInfra", "tag": "deepinfra/fp4", "quantization": "fp4"},
-            {"provider_name": "DeepInfra", "tag": "deepinfra/fp4", "quantization": "fp4"},
-            {"provider_name": "Novita", "tag": "novita", "quantization": "unknown"},
-            {"provider_name": "Nameless"},
+            {"provider_name": "DeepInfra", "tag": "deepinfra/fp4", "quantization": "fp4",
+                "supported_parameters": ["max_tokens", "structured_outputs"]},
+            {"provider_name": "DeepInfra", "tag": "deepinfra/fp4", "quantization": "fp4",
+                "supported_parameters": ["structured_outputs"]},
+            {"provider_name": "Novita", "tag": "novita", "quantization": "unknown",
+                "supported_parameters": ["structured_outputs"]},
+            {"provider_name": "Nameless", "supported_parameters": ["structured_outputs"]},
+            {"provider_name": "Tenstorrent", "tag": "tenstorrent/fp8", "quantization": "fp8",
+                "supported_parameters": ["max_tokens", "response_format"]},
+            {"provider_name": "Bare", "tag": "bare", "quantization": "fp8"},
         ]}});
         let hosts = hosts_in(&reply);
         assert_eq!(

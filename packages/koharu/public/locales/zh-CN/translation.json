@@ -426,7 +426,7 @@
       "translator": {
         "host": "OpenRouter 提供商",
         "hostAuto": "自动（使用路由规则）",
-        "hostDescription": "仅将此模型的请求发送给一个指定的 OpenRouter 提供商，不进行回退。“自动”则遵循“提供商”设置中的路由偏好。",
+        "hostDescription": "仅将此模型的请求发送给一个指定的 OpenRouter 提供商，不进行回退。列表中仅显示支持此模型结构化输出的提供商。“自动”则遵循“提供商”设置中的路由偏好。",
         "hostError": "无法加载提供商。",
         "hostLoading": "正在加载提供商…",
         "instructions": "附加指示",

@@ -426,7 +426,7 @@
       "translator": {
         "host": "Proveedor de OpenRouter",
         "hostAuto": "Automático (usar la regla de enrutamiento)",
-        "hostDescription": "Envía las solicitudes de este modelo solo a un proveedor de OpenRouter, sin alternativas. «Automático» sigue la preferencia de enrutamiento de los ajustes de Proveedores.",
+        "hostDescription": "Envía las solicitudes de este modelo solo a un proveedor de OpenRouter, sin alternativas. Solo se muestran los proveedores que admiten salida estructurada para este modelo. «Automático» sigue la preferencia de enrutamiento de los ajustes de Proveedores.",
         "hostError": "No se pudieron cargar los proveedores.",
         "hostLoading": "Cargando proveedores…",
         "instructions": "Instrucciones adicionales",
