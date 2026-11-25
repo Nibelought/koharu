@@ -20,6 +20,7 @@ import { vendorName } from '@/lib/vendors'
 import {
   commands,
   type Detector,
+  type Host,
   type Inpainter,
   type Model,
   type PipelineConfig,
@@ -292,9 +293,9 @@ function OpenRouterHost({
     staleTime: 5 * 60_000,
   })
   const choices: Record<string, string> = { [AUTO]: t('settings.pipeline.translator.hostAuto') }
-  for (const host of hosts.data ?? []) {
-    choices[host.tag] = host.quantization ? `${host.name} (${host.quantization})` : host.name
-  }
+  const labelled = (hosts.data ?? []).map((host) => [host.tag, hostLabel(host)] as const)
+  labelled.sort(([, a], [, b]) => a.localeCompare(b))
+  for (const [tag, label] of labelled) choices[tag] = label
   // A pin the list doesn't show, as while it loads, stays shown.
   if (value && !(value in choices)) choices[value] = value
   return (
@@ -316,6 +317,15 @@ function OpenRouterHost({
       />
     </PreferenceRow>
   )
+}
+
+/** A host's name with what tells its endpoints apart: its quantization and the region or tier the
+ * rest of its tag names, as `Sail Research (fp4, us)` for `sail-research/fp4/us`. */
+function hostLabel(host: Host): string {
+  const parts = [host.quantization, ...host.tag.split('/').slice(1)].filter(
+    (part, index, all): part is string => !!part && all.indexOf(part) === index,
+  )
+  return parts.length > 0 ? `${host.name} (${parts.join(', ')})` : host.name
 }
 
 /** The translator's options under `[pipeline.translator]`, as rows of its section: whether the
